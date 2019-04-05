@@ -8,7 +8,7 @@ class Linear:
     def __call__(self, x):
         return tf.matmul(x, self.w)
 
-    def solve_linear_system(self, x, y, regularizer):
+    def _solve_linear_system(self, x, y, regularizer):
         return tf.matmul(pseudo_inverse(x, regularizer), y)
 
     def fit(self, x, y, regularizer):
@@ -18,7 +18,7 @@ class Linear:
           - y: matrix of wanted outputs, shape=(*, C) where C is the number of outputs
         '''
         assert len(x) == len(y)
-        self.w = self.solve_linear_system(x, y, regularizer)
+        self.w = self._solve_linear_system(x, y, regularizer)
 
 
 class ELM(Linear):
@@ -57,4 +57,4 @@ class ELM(Linear):
         # calculate H
         h = self._calculate_h(x)
         # calculate w
-        self.w = self.solve_linear_system(h, y, regularizer)
+        self.w = self._solve_linear_system(h, y, regularizer)
