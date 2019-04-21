@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 import tensorflow as tf
 
 
@@ -15,7 +17,7 @@ def concat_tensors_from_dict(tensors_dict, axis=0):
 
 def separate_by_class(X: tf.Tensor, Y: tf.Tensor, classes: int, ratio: float = 0.8) -> dict:
     assert 0 < ratio < 1
-    train_tensors, valid_tensors = {}, {}
+    train_tensors, valid_tensors = OrderedDict(), OrderedDict()
     for i in range(classes):
         ci = tf.equal(Y, tf.constant(len(Y) * [i]))
         xi = X[ci]

@@ -30,7 +30,7 @@ class ELM(Linear):
         self.activation_function = activation_function
 
     def __call__(self, x):
-        assert x.shape[1] == self.hidsize
+        assert x.shape[1] == self.insize
         return tf.matmul(self._calculate_h(x), self.w)
 
     def _activation(self, x):
@@ -40,9 +40,9 @@ class ELM(Linear):
             return tf.tanh(x)
 
     def _calculate_h(self, x):
-        return self.activation(tf.matmul(x, self.v) + self.b)
+        return self._activation(tf.matmul(x, self.v) + self.b)
 
-    def fit(self, x, y, regularizer):
+    def fit(self, x, y, regularizer, seed=0):
         '''Fits the data to a ELM model
         *Args:
           - x: matrix of the inputs to be used, shape=(*, N) where N is the dimension of the inputs
@@ -52,8 +52,9 @@ class ELM(Linear):
         assert x.shape[1] == self.insize
         assert y.shape[1] == self.nb_classes
         # generates a random matrix V and bias b
-        self.v = tf.random.normal(shape=(self.insize, self.hidsize))
-        self.b = tf.random.uniform(shape=(self.hidsize,))
+        self.v = tf.random.normal(
+            shape=(self.insize, self.hidsize), seed=seed)
+        self.b = tf.random.normal(shape=(self.hidsize,), seed=seed)
         # calculate H
         h = self._calculate_h(x)
         # calculate w
