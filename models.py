@@ -1,4 +1,7 @@
+from typing import List, Dict, Tuple
+
 import tensorflow as tf
+from tensorflow import keras
 
 from .math_utils import pseudo_inverse
 
@@ -59,3 +62,52 @@ class ELM(Linear):
         h = self._calculate_h(x)
         # calculate w
         self.w = self._solve_linear_system(h, y, regularizer)
+
+
+class MLP(keras.Model):
+
+    def __init__(self, input_shape: Tuple[int], linear_units: List[int], dropout: float, num_classes: int):
+        super().__init__()
+        # criando as camadas lineares
+        linear_layers = []
+        for units in linear_units:
+            linear_layers += [
+                keras.layers.Dense(units, activation='relu'),
+                keras.layers.Dropout(dropout)
+            ]
+        # criando o modelo
+        self.net = keras.models.Sequential([
+            keras.layers.Flatten(input_shape=input_shape),
+            *linear_layers,
+            keras.layers.Dense(
+                num_classes, activation='softmax' if num_classes > 1 else 'sigmoid')
+        ])
+
+    def call(self, x):
+        return self.net(x)
+
+
+class ConvModel(keras.Model):
+
+    def __init__(self, input_shape: Tuple[int], out_channels: List[int], dropout: float, num_classes: int):
+        super().__init__()
+        # criando as camadas convolucionais
+        linear_layers = [keras.layers.Conv2D(out_channels[0], kernel_size=3, activation='relu',
+                                             input_shape=input_shape)]
+        for units in out_channels[1:]:
+            linear_layers += [
+                keras.layers.Conv2D(units, kernel_size=3, activation='relu'),
+                keras.layers.MaxPooling2D(pool_size=2),
+                keras.layers.Dropout(dropout)
+            ]
+        # criando o modelo
+        self.net = keras.models.Sequential(linear_layers)
+        # looking the size of the output
+        self.flat = keras.layers.Flatten()
+        self.out = keras.layers.Dense(
+            num_classes, activation='softmax' if num_classes > 1 else 'sigmoid')
+
+    def call(self, x):
+        x = self.net(x)
+        x = self.flat(x)
+        return self.out(x)
