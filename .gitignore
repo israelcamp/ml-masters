@@ -1,2 +1,11 @@
 .vscode/
 __pycache__/
+.ipynb_checkpoints
+
+#folders
+imgs
+glue_data
+runs
+
+# file formats
+*.pdf
