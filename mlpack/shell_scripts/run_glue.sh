@@ -14,7 +14,7 @@ export TASK_NAME="MRPC"
   --max_seq_length 128 \
   --per_gpu_train_batch_size 4 \
   --gradient_accumulation_steps 8 \
-  --learning_rate 2e-5 \
-  --num_train_epochs 3.0 \
-  --output_dir /tmp/$TASK_NAME/
+  --learning_rate 2e-6 \
+  --num_train_epochs 8.0 \
+  --output_dir /tmp/$TASK_NAME/ \
   --fp16
