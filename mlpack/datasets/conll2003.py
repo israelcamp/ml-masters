@@ -105,7 +105,7 @@ class NerProcessor(DataProcessor):
             "[PAD]" for padding
             :return:
         """
-        return ["[PAD]", "B-MISC", "I-MISC", "O", "B-PER", "I-PER", "B-ORG", "I-ORG", "B-LOC", "I-LOC", "[CLS]", "[SEP]", "X"]
+        return ["B-MISC", "I-MISC", "O", "B-PER", "I-PER", "B-ORG", "I-ORG", "B-LOC", "I-LOC", "[CLS]", "[SEP]", "[PAD]", "X"]
 
     def _create_examples(self, lines, set_type):
         examples = []
@@ -153,20 +153,22 @@ def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer
         ntokens = []
         segment_ids = []
         label_ids = []
+        # adding the cls
         ntokens.append("[CLS]")
         segment_ids.append(0)
         valid.insert(0, 1)
-        label_mask.insert(0, 1)
+        label_mask.insert(0, 0)  # ignoring [CLS] on loss
         label_ids.append(label_map["[CLS]"])
         for i, token in enumerate(tokens):
             ntokens.append(token)
             segment_ids.append(0)
             if len(labels) > i:
                 label_ids.append(label_map[labels[i]])
+        # adding the sep
         ntokens.append("[SEP]")
         segment_ids.append(0)
         valid.append(1)
-        label_mask.append(1)
+        label_mask.append(0)  # ignoring [SEP] on loss
         label_ids.append(label_map["[SEP]"])
         input_ids = tokenizer.convert_tokens_to_ids(ntokens)
         input_mask = [1] * len(input_ids)
