@@ -105,7 +105,7 @@ class NerProcessor(DataProcessor):
             "[PAD]" for padding
             :return:
         """
-        return ["B-MISC", "I-MISC", "O", "B-PER", "I-PER", "B-ORG", "I-ORG", "B-LOC", "I-LOC", "[CLS]", "[SEP]", "[PAD]", "X"]
+        return ["[PAD]", "O", "B-MISC", "I-MISC", "B-PER", "I-PER", "B-ORG", "I-ORG", "B-LOC", "I-LOC", "[CLS]", "[SEP]", "X"]
 
     def _create_examples(self, lines, set_type):
         examples = []
@@ -119,8 +119,13 @@ class NerProcessor(DataProcessor):
         return examples
 
 
-def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer):
+def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer, sep_tag='X'):
     """Loads a data file into a list of `InputBatch`s."""
+
+    assert sep_tag in ('X', 'same')
+
+    def put_sep_tag(tag):
+        return sep_tag if sep_tag == 'X' else tag
 
     label_map = {label: i for i, label in enumerate(label_list, 0)}
 
@@ -142,7 +147,9 @@ def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer
                     valid.append(1)
                     label_mask.append(1)
                 else:
-                    labels.append('X')
+                    # TODO: Fix here, in case the sep_tag is same then the label_mask should be 1
+                    # could also give this as argument for the function
+                    labels.append(put_sep_tag(label_1))
                     valid.append(0)
                     label_mask.append(0)
         if len(tokens) >= max_seq_length - 1:
@@ -211,8 +218,8 @@ def get_conll2003(dir_path):
     }, processor.get_labels()
 
 
-def get_conll2003_features(examples_dict, labels, max_seq_length, tokenizer):
+def get_conll2003_features(examples_dict, labels, max_seq_length, tokenizer, sep_tag='X'):
     return {
         k: convert_examples_to_features(
-            examples, labels, max_seq_length, tokenizer) for k, examples in examples_dict.items()
+            examples, labels, max_seq_length, tokenizer, sep_tag) for k, examples in examples_dict.items()
     }
