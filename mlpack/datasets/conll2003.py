@@ -125,7 +125,7 @@ def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer
     assert sep_tag in ('X', 'same')
 
     def put_sep_tag(tag):
-        return (sep_tag, 0) if sep_tag == 'X' else (tag, 1)
+        return (sep_tag, 0) if sep_tag == 'X' else (tag if tag == 'O' else 'I-'+tag.split('-')[-1], 1)
 
     label_map = {label: i for i, label in enumerate(label_list, 0)}
 
