@@ -125,7 +125,7 @@ def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer
     assert sep_tag in ('X', 'same')
 
     def put_sep_tag(tag):
-        return sep_tag if sep_tag == 'X' else tag
+        return (sep_tag, 0) if sep_tag == 'X' else (tag, 1)
 
     label_map = {label: i for i, label in enumerate(label_list, 0)}
 
@@ -149,9 +149,10 @@ def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer
                 else:
                     # TODO: Fix here, in case the sep_tag is same then the label_mask should be 1
                     # could also give this as argument for the function
-                    labels.append(put_sep_tag(label_1))
+                    tag, mask = put_sep_tag(label_1)
+                    labels.append(tag)
                     valid.append(0)
-                    label_mask.append(0)
+                    label_mask.append(mask)
         if len(tokens) >= max_seq_length - 1:
             tokens = tokens[0:(max_seq_length - 2)]
             labels = labels[0:(max_seq_length - 2)]
