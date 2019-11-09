@@ -1,4 +1,20 @@
 import os
+import torch
+from torch.utils.data import Dataset
+
+
+class CoNLL2003Dataset(Dataset):
+
+    def __init__(self, features):
+        self.features = features
+
+    def __len__(self):
+        return len(self.features)
+
+    def __getitem__(self, idx):
+        feat = self.features[idx]
+        return torch.tensor(feat.input_ids), torch.tensor(feat.input_mask), \
+            torch.tensor(feat.label_id), torch.tensor(feat.label_mask)
 
 
 class InputExample(object):
@@ -204,6 +220,68 @@ def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer
                           label_id=label_ids,
                           valid_ids=valid,
                           label_mask=label_mask))
+    return features
+
+
+def convert_example_to_masked_feature(textlist, label, label_map, max_seq_length, tokenizer, masked_index):
+
+    tokens = []
+    label_mask = []
+    for i, word in enumerate(textlist):
+        if i == masked_index:  # mask the word
+            token = ['[MASK]']
+            label_mask.append(1)
+        else:
+            token = tokenizer.tokenize(word)
+            label_mask += len(token) * [0]
+        tokens.extend(token)
+
+    if len(tokens) >= max_seq_length - 1:  # cutting the sequence
+        tokens = tokens[0:(max_seq_length - 2)]
+        label_mask = label_mask[0:(max_seq_length - 2)]
+
+    # adding the [CLS]
+    tokens.insert(0, '[CLS]')
+    label_mask.insert(0, 0)
+
+    # adding the [SEP]
+    tokens.append('[SEP]')
+    label_mask.append(0)
+
+    # starting input_mask
+    input_mask = len(tokens) * [1]
+
+    # adding the [PAD] tokens
+    missing = max_seq_length - len(tokens)
+    if missing > 0:
+        tokens += missing * ['[PAD]']
+        label_mask += missing * [0]
+        input_mask += missing * [0]
+
+    assert all([len(v) == max_seq_length for v in [
+               tokens, input_mask, label_mask]])
+
+    # doing input_ids
+    input_ids = tokenizer.convert_tokens_to_ids(tokens)
+    return InputFeatures(input_ids=input_ids,
+                         input_mask=input_mask,
+                         segment_ids=None,
+                         label_id=label_map[label],
+                         valid_ids=None,
+                         label_mask=label_mask)
+
+
+def convert_examples_to_features_masked(examples, label_list, max_seq_length, tokenizer):
+
+    label_map = {label: i for i, label in enumerate(label_list, 0)}
+
+    features = []
+    for (ex_index, example) in enumerate(examples):
+        textlist = example.text_a.split(' ')
+        for j in range(len(textlist)):
+            label = example.label[j]  # take the label of the word
+            features.append(convert_example_to_masked_feature(
+                textlist, label, label_map, max_seq_length, tokenizer, j))
     return features
 
 
