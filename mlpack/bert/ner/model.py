@@ -78,8 +78,8 @@ class BertForNERClassification(BertForTokenClassification):
         active_logits = out.view(-1, self.num_labels)[label_mask == 1]
 
         # take the active labels
-        # remove one because of the [PAD] being the 0
-        active_labels = label_ids.view(-1)[label_mask == 1] - 1
+        # remove one because of the [PAD] being the 0 moved to DATASET
+        active_labels = label_ids.view(-1)[label_mask == 1]
 
         # calc the loss
         loss = self.loss_fct(active_logits, active_labels)

@@ -14,7 +14,7 @@ class CoNLL2003Dataset(Dataset):
     def __getitem__(self, idx):
         feat = self.features[idx]
         return torch.tensor(feat.input_ids), torch.tensor(feat.input_mask), \
-            torch.tensor(feat.label_id), torch.tensor(feat.label_mask)
+            torch.tensor(feat.label_id) - 1, torch.tensor(feat.label_mask)
 
 
 class InputExample(object):
