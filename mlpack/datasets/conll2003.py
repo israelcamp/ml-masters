@@ -240,6 +240,8 @@ def convert_example_to_masked_feature(textlist, label, label_map, max_seq_length
         tokens = tokens[0:(max_seq_length - 2)]
         label_mask = label_mask[0:(max_seq_length - 2)]
 
+    if all([l == 0 for l in label_mask]):
+        return None
     # adding the [CLS]
     tokens.insert(0, '[CLS]')
     label_mask.insert(0, 0)
@@ -280,8 +282,10 @@ def convert_examples_to_features_masked(examples, label_list, max_seq_length, to
         textlist = example.text_a.split(' ')
         for j in range(len(textlist)):
             label = example.label[j]  # take the label of the word
-            features.append(convert_example_to_masked_feature(
-                textlist, label, label_map, max_seq_length, tokenizer, j))
+            feat = convert_example_to_masked_feature(
+                textlist, label, label_map, max_seq_length, tokenizer, j)
+            if feat is not None:
+                features.append(feat)
     return features
 
 
