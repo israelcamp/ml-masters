@@ -15,36 +15,35 @@ def train(args, model, dl_train, dl_valid, optimizer, scheduler=None, evaluate_f
 
     for ep in tqdm(range(args.num_epochs), desc='Epochs'):
         model.train()
-        if ep > 0:
-            for step, (input_ids, input_mask, label_ids, label_mask) in tqdm(enumerate(dl_train), leave=False, total=len(dl_train)):
-                input_ids, input_mask, label_ids, label_mask = to_device(input_ids, input_mask, label_ids,
-                                                                         label_mask, device=device)
+        for step, (input_ids, input_mask, label_ids, label_mask) in tqdm(enumerate(dl_train), leave=False, total=len(dl_train)):
+            input_ids, input_mask, label_ids, label_mask = to_device(input_ids, input_mask, label_ids,
+                                                                     label_mask, device=device)
 
-                loss, _, _ = model(input_ids, input_mask,
-                                   label_ids, label_mask)
+            loss, _, _ = model(input_ids, input_mask,
+                               label_ids, label_mask)
 
-                if args.grad_steps > 1:
-                    loss = loss / args.grad_steps
+            if args.grad_steps > 1:
+                loss = loss / args.grad_steps
 
-                if args.fp16:
-                    with amp.scale_loss(loss, optimizer) as scaled_loss:
-                        scaled_loss.backward()
-                    torch.nn.utils.clip_grad_norm_(
-                        amp.master_params(optimizer), args.max_grad_norm)
-                else:
-                    loss.backward()
-                    torch.nn.utils.clip_grad_norm_(
-                        model.parameters(), args.max_grad_norm)
+            if args.fp16:
+                with amp.scale_loss(loss, optimizer) as scaled_loss:
+                    scaled_loss.backward()
+                torch.nn.utils.clip_grad_norm_(
+                    amp.master_params(optimizer), args.max_grad_norm)
+            else:
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(
+                    model.parameters(), args.max_grad_norm)
 
-                if (step + 1) % args.grad_steps == 0 or (step + 1) == len(dl_train):
-                    optimizer.step()
-                    model.zero_grad()
-                    if scheduler:
-                        scheduler.step()
+            if (step + 1) % args.grad_steps == 0 or (step + 1) == len(dl_train):
+                optimizer.step()
+                model.zero_grad()
+                if scheduler:
+                    scheduler.step()
 
-                if args.writer:
-                    args.writer.add_scalar('loss/train', loss, args.n_iter)
-                args.n_iter += 1
+            if args.writer:
+                args.writer.add_scalar('loss/train', loss, args.n_iter)
+            args.n_iter += 1
 
         # evaluate
         if evaluate_fn:
