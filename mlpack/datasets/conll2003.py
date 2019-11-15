@@ -41,13 +41,14 @@ class InputExample(object):
 class InputFeatures(object):
     """A single set of features of data."""
 
-    def __init__(self, input_ids, input_mask, segment_ids, label_id, valid_ids=None, label_mask=None):
+    def __init__(self, input_ids, input_mask, segment_ids, label_id, valid_ids=None, label_mask=None, masked_word=None):
         self.input_ids = input_ids
         self.input_mask = input_mask
         self.segment_ids = segment_ids
         self.label_id = label_id
         self.valid_ids = valid_ids
         self.label_mask = label_mask
+        self.masked_word = masked_word
 
 
 def readfile(filename):
@@ -230,6 +231,7 @@ def convert_example_to_masked_feature(textlist, label, label_map, max_seq_length
     for i, word in enumerate(textlist):
         if i == masked_index:  # mask the word
             token = ['[MASK]']
+            masked_word = word
             label_mask.append(1)
         else:
             token = tokenizer.tokenize(word)
@@ -270,7 +272,9 @@ def convert_example_to_masked_feature(textlist, label, label_map, max_seq_length
                          segment_ids=None,
                          label_id=label_map[label],
                          valid_ids=None,
-                         label_mask=label_mask)
+                         label_mask=label_mask,
+                         masked_word=masked_word
+                         )
 
 
 def convert_examples_to_features_masked(examples, label_list, max_seq_length, tokenizer):
