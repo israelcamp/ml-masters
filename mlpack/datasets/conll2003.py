@@ -230,7 +230,12 @@ def convert_example_to_masked_feature(textlist, label, label_map, max_seq_length
     label_mask = []
     for i, word in enumerate(textlist):
         if i == masked_index:  # mask the word
-            token = ['[MASK]']
+            if word == word.lower():
+                token = ['[MASK]']
+            elif word[0] == word[0].upper():
+                token = ['[MASKU]']
+            else:
+                token = ['[MASKC]']
             masked_word = word
             label_mask.append(1)
         else:
