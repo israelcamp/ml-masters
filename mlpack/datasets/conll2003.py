@@ -229,17 +229,18 @@ def convert_example_to_masked_feature(textlist, label, label_map, max_seq_length
     tokens = []
     label_mask = []
     for i, word in enumerate(textlist):
+        token = tokenizer.tokenize(word)
         if i == masked_index:  # mask the word
-            if word == word.lower():
-                token = ['[MASK]']
-            elif word[0] == word[0].upper():
-                token = ['[MASKU]']
-            else:
-                token = ['[MASKC]']
+
+            # if word == word.lower():
+            #     token = ['[MASK]']
+            # elif word[0] == word[0].upper():
+            #     token = ['[MASKU]']
+            # else:
+            #     token = ['[MASKC]']
             masked_word = word
-            label_mask.append(1)
+            label_mask += [1] + (len(token) - 1) * [0]
         else:
-            token = tokenizer.tokenize(word)
             label_mask += len(token) * [0]
         tokens.extend(token)
 
@@ -268,7 +269,7 @@ def convert_example_to_masked_feature(textlist, label, label_map, max_seq_length
         input_mask += missing * [0]
 
     assert all([len(v) == max_seq_length for v in [
-               tokens, input_mask, label_mask]])
+               tokens, input_mask, label_mask]]), f'{len(label_mask)}'
 
     # doing input_ids
     input_ids = tokenizer.convert_tokens_to_ids(tokens)
