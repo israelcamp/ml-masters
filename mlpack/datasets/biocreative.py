@@ -78,6 +78,8 @@ def convert_entry_to_example(entry):
     example_text = re.sub('[0-9]{1,}\|[a|t]\|', '', entry)
     # find the id
     id_start = example_text.find(example_id)
+    if id_start < 0:
+        return None
     text = example_text[:id_start]
     annotations_text = example_text[id_start:].split('\n')
 
@@ -121,9 +123,13 @@ def read_examples(filepath):
     file_text = file.read()
 
     entries = file_text.split('\n\n')
-    return [
-        convert_entry_to_example(entry) for entry in entries if len(entry)
-    ]
+    examples = []
+    for entry in entries:
+        if len(entry):
+            ex = convert_entry_to_example(entry)
+            if ex:
+                examples.append(ex)
+    return examples
 
 
 def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer, sep_tag='X'):
