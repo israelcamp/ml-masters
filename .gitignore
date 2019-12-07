@@ -6,6 +6,9 @@ __pycache__/
 imgs
 glue_data
 runs
+datasets/BioCreativeIII
+datasets/GNormPlus
 
 # file formats
 *.pdf
+*.zip
