@@ -69,6 +69,6 @@ def train(args, model, dl_train, dl_valid, optimizer, scheduler=None, evaluate_f
             save_model(model, optimizer, args.ckp_path, scheduler=scheduler)
         else:
             if valid_acc > args.best_acc:
-                best_acc = valid_acc
+                args.best_acc = valid_acc
                 save_model(model, optimizer, args.ckp_path,
                            scheduler=scheduler)
