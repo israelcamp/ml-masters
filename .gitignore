@@ -12,3 +12,4 @@ datasets/GNormPlus
 # file formats
 *.pdf
 *.zip
+*.ckp
