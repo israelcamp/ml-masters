@@ -1,4 +1,3 @@
-from tqdm import tqdm as tqdm
 import torch
 
 from mlpack.bert.ner.utils import to_device, save_model
@@ -10,7 +9,13 @@ except ImportError:
         "Please install apex from https://www.github.com/nvidia/apex to use fp16 training.")
 
 
-def train(args, model, dl_train, dl_valid, optimizer, scheduler=None, evaluate_fn=None):
+def train(args, model, dl_train, dl_valid, optimizer, scheduler=None, evaluate_fn=None, notebook=True):
+
+    if notebook:
+        from tqdm import tqdm_notebook as tqdm
+    else:
+        from tqdm import tqdm
+
     device = args.device
 
     for ep in tqdm(range(args.num_epochs), desc='Epochs'):
