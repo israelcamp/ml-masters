@@ -20,12 +20,15 @@ def train(args, model, dl_train, dl_valid, optimizer, scheduler=None, evaluate_f
 
     for ep in tqdm(range(args.num_epochs), desc='Epochs'):
         model.train()
+        losses_train = []
         for step, (input_ids, input_mask, label_ids, label_mask) in tqdm(enumerate(dl_train), leave=False, total=len(dl_train)):
             input_ids, input_mask, label_ids, label_mask = to_device(input_ids, input_mask, label_ids,
                                                                      label_mask, device=device)
 
             loss, _, _ = model(input_ids, input_mask,
                                label_ids, label_mask)
+
+            losses_train.append(loss.item())
 
             if args.grad_steps > 1:
                 loss = loss / args.grad_steps
@@ -49,6 +52,9 @@ def train(args, model, dl_train, dl_valid, optimizer, scheduler=None, evaluate_f
             if args.writer:
                 args.writer.add_scalar('loss/train', loss, args.n_iter)
             args.n_iter += 1
+
+        print(
+            f'-- Train Loss {sum(losses_train)/len(losses_train)}', flush=True)
 
         # evaluate
         if evaluate_fn:
