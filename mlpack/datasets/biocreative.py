@@ -100,12 +100,12 @@ def convert_entry_to_example(entry):
         end_token = char_to_word_offset[annot.end]
         labels[start_token] = 'B-' + annot.label
         for j in range(start_token+1, end_token+1):
-            t = doc_tokens[j].text
-            if len(t) == 1:
-                if not is_punctuation(t):
-                    labels[j] = 'I-' + annot.label
-            else:
-                labels[j] = 'I-' + annot.label
+            # t = doc_tokens[j].text
+            labels[j] = 'I-' + annot.label
+            # if len(t) == 1:
+            # if not is_punctuation(t):
+            # else:
+            #     labels[j] = 'I-' + annot.label
 
     assert len(doc_tokens) == len(labels)
 

@@ -13,3 +13,6 @@ datasets/GNormPlus
 *.pdf
 *.zip
 *.ckp
+
+# files
+datasets/ENEL/*.csv
