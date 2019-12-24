@@ -1,1 +1,1 @@
-from samplers.imbalanced_sampler import ImbalancedDatasetSampler
+from mlpack.samplers.imbalanced_sampler import ImbalancedDatasetSampler
