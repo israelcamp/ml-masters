@@ -3,6 +3,7 @@ __pycache__/
 .ipynb_checkpoints
 
 #folders
+models/
 imgs
 glue_data
 runs

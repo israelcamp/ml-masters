@@ -59,7 +59,7 @@ def save_model(model, optimizer, ckp_path, scheduler=None):
     if scheduler:
         sched_path = _scheduler_ckp_path(ckp_path)
         torch.save(scheduler.state_dict(), optim_path)
-    print('Saved new checkpoint', flush=True)
+    print(f'Saved new checkpoint at {ckp_path}', flush=True)
 
 
 def to_device(*tensors, device='cpu'):
