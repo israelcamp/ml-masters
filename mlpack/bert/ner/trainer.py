@@ -72,5 +72,5 @@ class BertNERTrainer(BaseTrainer):
         s += f'\nF1 per Label {f1_on_labels}'
         s += f'\nClass. Report:\n{classification_report(trues, preds)}'
         s += f'\nConfusion Matrix:\n{conf}'
-        self.train_logger(s)
+        self.train_logger.info(s)
         return np.array(losses).mean(), f1
