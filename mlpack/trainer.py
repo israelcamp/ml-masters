@@ -72,6 +72,15 @@ class BaseTrainer:
     def dataloader_generator(dataloader):
         '''
         DataLoader generator, should return a dictionary of tensors
+        >>> for x, y in dataloader:
+        >>>   yield {
+        >>>     'inputs':{
+        >>>        'input': x   
+        >>>      },
+        >>>      'targets': {
+        >>>          'y': y
+        >>>      }
+        >>>   }
         '''
         raise NotImplementedError
 
@@ -127,35 +136,32 @@ class BaseTrainer:
         self.train_logger.info(f'Saved new checkpoint at {ckp_path}')
 
     def evaluate_fn(self, model, dataloader, loss_fn):
-        model.eval()
-        losses = []
-        preds = []
-        trues = []
-        dl_gen = self.dataloader_generator(dataloader)
-        for batch in self.tqdm(dl_gen, leave=False, desc='Eval...', total=len(dataloader)):
-            inputs = batch['inputs']
-            targets = batch['targets']
-
-            with torch.no_grad():
-                o = model(**inputs)
-
-            loss = self.loss_from_model(o, targets, loss_fn)
-
-            y = targets['y']
-
-            preds += o.argmax(1).detach().cpu().numpy().tolist()
-            trues += y.detach().cpu().numpy().tolist()
-            losses.append(loss.item())
-
-        acc = accuracy_score(trues, preds)
-        f1 = f1_score(trues, preds)
-        conf = confusion_matrix(trues, preds)
-
-        s = '--- Validation ---'
-        s += f'\nF1 = {f1}\t Acc = {acc}'
-        s += f'\n{conf}'
-        self.train_logger.info(s)
-        return np.array(losses).mean(), f1
+        '''
+        >>> model.eval()
+        >>> losses = []
+        >>> preds = []
+        >>> trues = []
+        >>> dl_gen = self.dataloader_generator(dataloader)
+        >>> for batch in self.tqdm(dl_gen, leave=False, desc='Eval...', total=len(dataloader)):
+        >>>     inputs = batch['inputs']
+        >>>     targets = batch['targets']
+        >>>     with torch.no_grad():
+        >>>         o = model(**inputs)
+        >>>     loss = self.loss_from_model(o, targets, loss_fn)
+        >>>     y = targets['y']
+        >>>     preds += o.argmax(1).detach().cpu().numpy().tolist()
+        >>>     trues += y.detach().cpu().numpy().tolist()
+        >>>     losses.append(loss.item())
+        >>> acc = accuracy_score(trues, preds)
+        >>> f1 = f1_score(trues, preds)
+        >>> conf = confusion_matrix(trues, preds)
+        >>> s = '--- Validation ---'
+        >>> s += f'\nF1 = {f1}\t Acc = {acc}'
+        >>> s += f'\n{conf}'
+        >>> self.train_logger.info(s)
+        >>> return np.array(losses).mean(), f1
+        '''
+        raise NotImplementedError
 
     def arguments_logging(self, args: TrainArgs, model, dl_train, dl_valid, optimizer, loss_fn=None,
                           scheduler=None):
