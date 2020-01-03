@@ -63,7 +63,7 @@ class BertNERTrainer(BaseTrainer):
             trues += ts
 
         acc = accuracy_score(trues, preds)
-        f1 = f1_score(trues, preds)
+        f1 = f1_score(trues, preds, average='micro')
         conf = confusion_matrix(trues, preds)
         f1_on_labels = f1_per_label(trues, preds)
 
@@ -72,5 +72,5 @@ class BertNERTrainer(BaseTrainer):
         s += f'\nF1 per Label {f1_on_labels}'
         s += f'\nClass. Report:\n{classification_report(trues, preds)}'
         s += f'\nConfusion Matrix:\n{conf}'
-        self.looger(s)
+        self.train_logger(s)
         return np.array(losses).mean(), f1
