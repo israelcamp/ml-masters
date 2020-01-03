@@ -154,7 +154,7 @@ class BaseTrainer:
         s = '--- Validation ---'
         s += f'\nF1 = {f1}\t Acc = {acc}'
         s += f'\n{conf}'
-        self.train_logger.infofix(s)
+        self.train_logger.info(s)
         return np.array(losses).mean(), f1
 
     def arguments_logging(self, args: TrainArgs, model, dl_train, dl_valid, optimizer, loss_fn=None,

@@ -50,19 +50,19 @@ class BertNERHandler:
 
     def convert_output_to_lists(self, out, input_ids, label_mask):
         data = []
-        for ex, in_ids, lm in zip(out, input_ids, label_mask):
-            preds = ex.argmax(1).to('cpu').numpy().tolist()
-            in_ids = in_ids.to('cpu').numpy().tolist()
-            sep_index = in_ids.index(102)  # [SEP] id
-            token_ids = in_ids[1:sep_index]
-            labels = [
-                self.labels[y] for y in preds[1:sep_index]
-            ]
-            mask = lm.to('cpu').numpy().tolist()[1:sep_index]
-            data.append(
-                (token_ids, labels, mask)
-            )
-        return data[0]
+        # for ex, in_ids, lm in zip(out, input_ids, label_mask):
+        preds = out[0].argmax(1).to('cpu').numpy().tolist()
+        in_ids = input_ids[0].to('cpu').numpy().tolist()
+        sep_index = in_ids.index(102)  # [SEP] id
+        token_ids = in_ids[1:sep_index]
+        labels = [
+            self.labels[y] for y in preds[1:sep_index]
+        ]
+        mask = label_mask[0].to('cpu').numpy().tolist()[1:sep_index]
+        # data.append(
+        return (token_ids, labels, mask)
+        # )
+        # return data[0]
 
     def find_ient(self, token_ids, labels, mask, ent_name, i):
         name = []
