@@ -33,7 +33,7 @@ class BertNERTrainer(BaseTrainer):
     def loss_from_model(model_output, targets, loss_fn=None):
         return model_output[0]
 
-    def eval_fn(self, model, dataloader, loss_fn):
+    def evaluate_fn(self, model, dataloader, loss_fn):
         model.eval()
         losses = []
         preds = []
