@@ -38,6 +38,7 @@ class BaseTrainer:
         self.fp16 = fp16
         self.max_grad_norm = max_grad_norm
         self.log_dir = log_dir
+        self.notebook = notebook
         create_dir(log_dir)
         self.train_logger = self._init_train_logger()
         self.params_logger = self._init_params_logger()
@@ -111,15 +112,20 @@ class BaseTrainer:
         return logger
 
     def _init_train_logger(self):
-        return self._init_logger('train', [
-            logging.FileHandler(self.train_file),
-            logging.StreamHandler()
-        ])
+        handlers = [logging.FileHandler(self.train_file)]
+        if not self.notebook:
+            handlers.append(logging.StreamHandler())
+        return self._init_logger('train', handlers)
 
     def _init_params_logger(self):
         return self._init_logger('params', [
             logging.FileHandler(self.params_file)
         ])
+
+    def logtrain_string(self, s):
+        if self.notebook:
+            print(s, flush=True)
+        self.train_logger.info(s)
 
     def model_checkpoint_path(self, ckp_name):
         return os.path.join(self.log_dir, ckp_name)
@@ -133,7 +139,7 @@ class BaseTrainer:
         if scheduler:
             sched_path = self._scheduler_ckp_path(ckp_path)
             torch.save(scheduler.state_dict(), optim_path)
-        self.train_logger.info(f'Saved new checkpoint at {ckp_path}')
+        self.logtrain_string(f'Saved new checkpoint at {ckp_path}')
 
     def evaluate_fn(self, model, dataloader, loss_fn):
         '''
@@ -230,7 +236,7 @@ class BaseTrainer:
             s = f'\nAbsolute Epoch {self.epoch} - Relative Epoch [{ep+1}/{args.num_epochs}]'
             s += f'\nTrain Loss {sum(losses_train)/len(losses_train)}'
             s += f'\nValid Loss {valid_loss} Metric {valid_metric}'
-            self.train_logger.info(s)
+            self.logtrain_string(s)
 
             if valid_metric > self.best_metric:
                 self.best_metric = valid_metric
