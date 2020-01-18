@@ -2,7 +2,7 @@ import re
 import os
 from typing import List
 
-from tokenization import TokenizerWithAlignment
+from mlpack.bert.tokenization import TokenizerWithAlignment
 
 
 class InputExample:
