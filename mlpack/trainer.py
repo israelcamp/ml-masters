@@ -205,12 +205,14 @@ class BaseTrainer:
                 if self.fp16:
                     with amp.scale_loss(loss, optimizer) as scaled_loss:
                         scaled_loss.backward()
-                    torch.nn.utils.clip_grad_norm_(
-                        amp.master_params(optimizer), self.max_grad_norm)
+                    if self.max_grad_norm is not None:
+                        torch.nn.utils.clip_grad_norm_(
+                            amp.master_params(optimizer), self.max_grad_norm)
                 else:
                     loss.backward()
-                    torch.nn.utils.clip_grad_norm_(
-                        model.parameters(), self.max_grad_norm)
+                    if self.max_grad_norm is not None:
+                        torch.nn.utils.clip_grad_norm_(
+                            model.parameters(), self.max_grad_norm)
 
                 if (step + 1) % self.grad_steps == 0 or (step + 1) == len(dl_train):
                     optimizer.step()
