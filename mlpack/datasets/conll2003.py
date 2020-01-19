@@ -224,7 +224,7 @@ def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer
     return features
 
 
-def convert_example_to_masked_feature(textlist, label, label_map, max_seq_length, tokenizer, masked_index):
+def convert_example_to_masked_feature(textlist, label, label_map, max_seq_length, tokenizer, masked_index, do_mask=True):
 
     tokens = []
     label_mask = []
@@ -238,6 +238,8 @@ def convert_example_to_masked_feature(textlist, label, label_map, max_seq_length
             #     token = ['[MASKU]']
             # else:
             #     token = ['[MASKC]']
+            if do_mask:
+                token = ['[MASK]']
             masked_word = word
             label_mask += [1] + (len(token) - 1) * [0]
         else:
@@ -283,7 +285,7 @@ def convert_example_to_masked_feature(textlist, label, label_map, max_seq_length
                          )
 
 
-def convert_examples_to_features_masked(examples, label_list, max_seq_length, tokenizer):
+def convert_examples_to_features_masked(examples, label_list, max_seq_length, tokenizer, do_mask=True):
 
     label_map = {label: i for i, label in enumerate(label_list, 0)}
 
@@ -293,7 +295,7 @@ def convert_examples_to_features_masked(examples, label_list, max_seq_length, to
         for j in range(len(textlist)):
             label = example.label[j]  # take the label of the word
             feat = convert_example_to_masked_feature(
-                textlist, label, label_map, max_seq_length, tokenizer, j)
+                textlist, label, label_map, max_seq_length, tokenizer, j, do_mask)
             if feat is not None:
                 features.append(feat)
     return features
