@@ -58,7 +58,10 @@ class NerProcessor(DataProcessor):
                 continue
             splits = line.split('\t')
             sentence.append(splits[0])
-            label.append(splits[-1]+'-DIS')
+            _label = splits[-1].strip('\n')
+            if _label in ('B', 'I'):
+                _label = f'{_label}-DIS'
+            label.append(_label)
 
         if len(sentence) > 0:
             data.append((sentence, label))
