@@ -63,8 +63,8 @@ class BertNERTrainer(BaseTrainer):
             trues += ts
 
         acc = accuracy_score(trues, preds)
-        f1 = f1_score(trues, preds, average='micro')
-        conf = confusion_matrix(trues, preds)
+        f1 = f1_score(trues, preds, average='micro', labels=self.ner_labels)
+        conf = confusion_matrix(trues, preds, labels=self.ner_labels)
         f1_on_labels = f1_per_label(trues, preds)
 
         s = '--- Validation ---'

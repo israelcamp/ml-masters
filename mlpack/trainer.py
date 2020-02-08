@@ -214,7 +214,8 @@ class BaseTrainer:
                         torch.nn.utils.clip_grad_norm_(
                             model.parameters(), self.max_grad_norm)
 
-                if (step + 1) % self.grad_steps == 0 or (step + 1) == len(dl_train):
+                # or (step + 1) == len(dl_train):
+                if (step + 1) % self.grad_steps == 0:
                     optimizer.step()
                     model.zero_grad()
                     if scheduler:

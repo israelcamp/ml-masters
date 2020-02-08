@@ -25,7 +25,7 @@ class BertForNERClassification(BertForTokenClassification):
         self.loss_fct = torch.nn.CrossEntropyLoss(weight=weights)
 
     def _change_bert_grad(self, requires_grad):
-        for name, params in self.model.named_parameters():
+        for name, params in self.bert.named_parameters():
             if name.startswith('bert'):
                 params.requires_grad = requires_grad
 
