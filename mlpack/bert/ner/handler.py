@@ -53,7 +53,7 @@ class BertNERHandler:
         # for ex, in_ids, lm in zip(out, input_ids, label_mask):
         preds = out[0].argmax(1).to('cpu').numpy().tolist()
         in_ids = input_ids[0].to('cpu').numpy().tolist()
-        sep_index = in_ids.index(102)  # [SEP] id
+        sep_index = in_ids.index(103)  # [SEP] id
         token_ids = in_ids[1:sep_index]
         labels = [
             self.labels[y] for y in preds[1:sep_index]
